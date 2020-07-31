@@ -4,6 +4,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
+import model.exceptions.DomainException;
+
 public class Reservation {
 
 	private static SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -11,8 +13,10 @@ public class Reservation {
 	private Date checkIn;
 	private Date checkOut;
 
-	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) {
-		super();
+	public Reservation(Integer roomNumber, Date checkIn, Date checkOut) throws DomainException {
+		if (!checkOut.after(checkIn)) {
+			throw new DomainException("Erro data de check out depois de check in");
+		}
 		this.roomNumber = roomNumber;
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
@@ -42,21 +46,21 @@ public class Reservation {
 		return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
 	}
 
-	public String updateDays(Date checkIn, Date checkOut) {
+	// metodo daum update e tbm cria excecao
+	public void updateDays(Date checkIn, Date checkOut) throws DomainException {
 
 		// Serve para não deixar atualizar datas que não sejam futuras
 		Date now = new Date();
 		if (checkIn.before(now) && checkOut.before(now)) {
-			return "Erro não pode aceitar tem que ser datas futuras";
+			// usa esta expressao tipicamente quando argumentos que se passa para metodos sao invalidos
+			// troquei a expressão IllegalArgumentException para minha propria
+			throw new DomainException("Erro não pode aceitar tem que ser datas futuras");
 		}
 		if (!checkOut.after(checkIn)) {
-			return "Erro data de check out depois de check in";
+			throw new DomainException("Erro data de check out depois de check in");
 		}
-
 		this.checkIn = checkIn;
 		this.checkOut = checkOut;
-		// não deu erro
-		return null;
 	}
 
 	@Override

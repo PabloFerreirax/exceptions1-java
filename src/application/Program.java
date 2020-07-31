@@ -5,47 +5,46 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-import javax.sound.sampled.ReverbType;
-
 import model.entities.Reservation;
+import model.exceptions.DomainException;
 
 public class Program {
 // quando o metodo pode dar erro tem que tratar ou colocar throws com o nome da excecao pois pode dar erro e assim propaga ela
-	public static void main(String[] args) throws ParseException {
+	public static void main(String[] args) {
 
 		Scanner sc = new Scanner(System.in);
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
-		System.out.print("Room Number: ");
-		int room = sc.nextInt();
-		System.out.print("Check-in (dd/MM/yyyy): ");
-		Date checkIn = sdf.parse(sc.next());
-		System.out.print("Check-Out (dd/MM/yyyy): ");
-		Date checkOut = sdf.parse(sc.next());
-		// after mostra se uma data é depois da outra
-		if (!checkOut.after(checkIn)) {
-			System.out.println("Erro data de check out depois de check in");
-		} 
-		else {
+		
+		// melhor coisa desta forma é que nada precisa ser mudado pois se der erro no try logo cai na minha excessao
+		try {
+			System.out.print("Room Number: ");
+			int room = sc.nextInt();
+			System.out.print("Check-in (dd/MM/yyyy): ");
+			Date checkIn = sdf.parse(sc.next());
+			System.out.print("Check-Out (dd/MM/yyyy): ");
+			Date checkOut = sdf.parse(sc.next());
+	
 			Reservation reserv = new Reservation(room, checkIn, checkOut);
 			System.out.println("Reservation: " + reserv);
-
 			System.out.println("Update na reserva: ");
 			System.out.print("Check-in (dd/MM/yyyy): ");
 			checkIn = sdf.parse(sc.next());
 			System.out.print("Check-Out (dd/MM/yyyy): ");
 			checkOut = sdf.parse(sc.next());
-			
-			// aqui atribuimos este update caso der erro a uma string error
-			String error = reserv.updateDays(checkIn, checkOut);
-			if(error != null) {
-				System.out.println("erro: " + error);
-			}
-			else {
-				System.out.println("Reservation: " + reserv);
-			}
+	
+		    reserv.updateDays(checkIn, checkOut);
+			System.out.println("Reservation: " + reserv);
 		}
-
+		catch(ParseException e) {
+			System.out.println("Invalid date format");
+		}
+		catch(DomainException e) { // Pega o argumento que demos na classe reservation
+			System.out.println("Invalid in reservation " + e.getMessage());
+		}
+		catch(RuntimeException e) {
+			System.out.println("Tem algo errado ai");
+		}
+		
 		sc.close();
 	}
 
